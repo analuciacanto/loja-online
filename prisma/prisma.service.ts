@@ -1,18 +1,15 @@
-import { Injectable, INestApplication, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit {
+export class PrismaService extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy {
+
   async onModuleInit() {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    await this.$connect();
+    await this.$connect(); // conecta ao banco quando o módulo inicia
   }
 
-  // Removido async do método para não quebrar ESLint
-  enableShutdownHooks(app: INestApplication) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    this.$on('beforeExit', async () => {
-      await app.close();
-    });
+  async onModuleDestroy() {
+    await this.$disconnect(); // desconecta ao destruir o módulo
   }
 }
